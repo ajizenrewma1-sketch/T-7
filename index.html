@@ -133,6 +133,7 @@
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
             opacity: 0; 
             transform: translateY(10px);
+            pointer-events: none;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
             z-index: 100; 
             display: flex;
@@ -155,6 +156,46 @@
         </svg>
         <span id="toast-text">คัดลอกข้อมูลสำเร็จ</span>
     </div>
+
+    <!-- Popup สำหรับเลือกประเภทรถ / คลาสผิด (ซ่อนไว้เป็นค่าเริ่มต้น) -->
+    <div id="classPopupModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all border border-slate-200 mx-4">
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <div class="p-1.5 bg-purple-100 text-purple-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
+                        </svg>
+                    </div>
+                    เลือกประเภทเหตุผลเพื่อคัดลอก (คลาสผิด/ค่อมเลน)
+                </h3>
+                <button onclick="closeClassPopup()" class="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1.5 rounded-lg transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-4 flex flex-col gap-3">
+                <button onclick="selectClassOption('ระบบคิดรายการค่าผ่านทางไม่ถูกต้อง และ Class รถไม่ถูกต้อง ราคาที่ถูกต้อง คือ 30 บาท Class รถ C1  = 4 ล้อ')" class="text-left p-4 rounded-xl border border-slate-200 hover:border-purple-400 hover:bg-purple-50 hover:shadow-md transition-all group">
+                    <div class="font-bold text-slate-700 group-hover:text-purple-700 text-sm">C1 = 4 ล้อ</div>
+                    <div class="text-xs text-slate-500 mt-1">ราคาที่ถูกต้อง คือ 30 บาท</div>
+                </button>
+                <button onclick="selectClassOption('ระบบคิดรายการค่าผ่านทางไม่ถูกต้อง และ Class รถไม่ถูกต้อง ราคาที่ถูกต้อง คือ 50 บาท Class รถ C2  = 6 ล้อ')" class="text-left p-4 rounded-xl border border-slate-200 hover:border-purple-400 hover:bg-purple-50 hover:shadow-md transition-all group">
+                    <div class="font-bold text-slate-700 group-hover:text-purple-700 text-sm">C2 = 6 ล้อ</div>
+                    <div class="text-xs text-slate-500 mt-1">ราคาที่ถูกต้อง คือ 50 บาท</div>
+                </button>
+                <button onclick="selectClassOption('ระบบคิดรายการค่าผ่านทางไม่ถูกต้อง และ Class รถไม่ถูกต้อง ราคาที่ถูกต้อง คือ 70 บาท Class รถ C3  = มากกว่า 6 ล้อ')" class="text-left p-4 rounded-xl border border-slate-200 hover:border-purple-400 hover:bg-purple-50 hover:shadow-md transition-all group">
+                    <div class="font-bold text-slate-700 group-hover:text-purple-700 text-sm">C3 = มากกว่า 6 ล้อ</div>
+                    <div class="text-xs text-slate-500 mt-1">ราคาที่ถูกต้อง คือ 70 บาท</div>
+                </button>
+                <div class="border-t border-slate-100 my-1"></div>
+                <button onclick="selectClassOption('รถเป็นรายการ TX ซ้ำ เป็นรถคล่อมเลนที่ตกถังผิดกฎหมาย รอดำเนินการลบออกจากระบบ')" class="text-left p-4 rounded-xl border border-slate-200 hover:border-rose-400 hover:bg-rose-50 hover:shadow-md transition-all group">
+                    <div class="font-bold text-slate-700 group-hover:text-rose-700 text-sm">ค่อมเลน</div>
+                    <div class="text-xs text-slate-500 mt-1">เป็นรายการ TX ซ้ำ รถคล่อมเลนตกถังผิดกฎหมาย</div>
+                </button>
+            </div>
+        </div>
+    </div>
     
     <!-- ส่วนควบคุมด้านบนสุด (Sticky Header) -->
     <div class="sticky-header w-full">
@@ -176,7 +217,7 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span>ระบบพร้อมใช้งาน</span>
                 </div>
-                <div class="text-slate-400 text-xs font-mono">v3.5 Enterprise</div>
+                <div class="text-slate-400 text-xs font-mono">v4.0 Enterprise</div>
             </div>
         </div>
     </div>
@@ -185,7 +226,7 @@
     <div class="w-full bg-white border-b border-slate-200 py-4 px-6 shadow-sm flex-shrink-0">
         <div class="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- 1. จำนวนรายการทั้งหมด -->
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
                 <div>
                     <span class="text-xs text-slate-500 font-medium">จำนวนรายการทั้งหมด</span>
                     <h3 id="stat-total" class="text-3xl font-bold text-slate-800 mt-1">0</h3>
@@ -198,7 +239,7 @@
             </div>
 
             <!-- 2. จำนวนรายการที่สำเร็จ (ที่เทสี) -->
-            <div class="bg-emerald-50/60 border border-emerald-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
+            <div class="bg-emerald-50/60 border border-emerald-200 rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
                 <div>
                     <span class="text-xs text-emerald-600 font-medium">จำนวนรายการที่สำเร็จ (ที่เทสี)</span>
                     <h3 id="stat-success" class="text-3xl font-bold text-emerald-700 mt-1">0</h3>
@@ -211,7 +252,7 @@
             </div>
 
             <!-- 3. จำนวนรายการที่ยังไม่สำเร็จ (ที่ยังไม่ถูกเทสี) -->
-            <div class="bg-rose-50/60 border border-rose-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
+            <div class="bg-rose-50/60 border border-rose-200 rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
                 <div>
                     <span class="text-xs text-rose-500 font-medium">จำนวนรายการที่ยังไม่สำเร็จ (ที่ยังไม่ถูกเทสี)</span>
                     <h3 id="stat-pending" class="text-3xl font-bold text-rose-700 mt-1">0</h3>
@@ -291,7 +332,7 @@
                     </span>
                     <div>
                         <h2 class="text-sm font-bold text-slate-800">แผ่นงานผลลัพธ์</h2>
-                        <p class="text-[10px] text-slate-400">ข้อมูลจะถูกจัดหมวดหมู่และคัดลอกได้อย่างแม่นยำ</p>
+                        <p class="text-[10px] text-slate-400">ข้อมูลจะถูกจัดหมวดหมู่และสามารถเลือกคัดลอกสรุปผลได้อย่างแม่นยำ</p>
                     </div>
                 </div>
                 <button onclick="copyTableText()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 px-3.5 rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm active:scale-95">
@@ -315,7 +356,7 @@
                             <th class="p-4 font-semibold">ด่าน</th>
                             <th class="p-4 font-semibold">วันเวลา</th>
                             <th class="p-4 font-semibold">ทะเบียน ระบบ</th>
-                            <th class="p-4 font-semibold w-[35%]">สรุปผล</th>
+                            <th class="p-4 font-semibold w-[35%] min-w-[280px]">สรุปผล</th>
                             <th class="p-4 font-semibold w-[150px] text-center">รูปภาพ</th>
                         </tr>
                     </thead>
@@ -348,6 +389,8 @@
 
     <script>
         const MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.","ม.ค","ก.พ","มี.ค","เม.ย","พ.ค","มิ.ย","ก.ค","ส.ค","ก.ย","ต.ค","พ.ย","ธ.ย"];
+        
+        let activeSummaryButton = null;
 
         // ฟังก์ชันลบเครื่องหมายอัญประกาศคู่ " " และเดี่ยว ' ' ออกโดยอัตโนมัติ
         function cleanQuotes(text) {
@@ -374,7 +417,7 @@
             const text = document.getElementById('toast-text');
             text.innerText = message;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
+            setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
         function copyReference() {
@@ -403,7 +446,10 @@
                 const toll = cells[3].innerText.trim();
                 const time = cells[4].innerText.trim();
                 const system = cells[5].innerText.trim();
-                const summary = cells[6].innerText.trim();
+                
+                // ดึงค่า text ที่ถูกซ่อนไว้ใน span summary-text ของคอลัมน์ที่ 6 (Index 6)
+                const summarySpan = cells[6].querySelector('.summary-text');
+                const summary = summarySpan ? summarySpan.innerText.trim() : cells[6].innerText.trim();
                 
                 output += `${manual}\t${type}\t${toll}\t${time}\t${system}\t${summary}\n`;
             });
@@ -567,7 +613,7 @@
             });
         }
 
-        // สั่งคัดลอกส่วนย่อยและระบายแถวเมื่อคัดลอกสรุป
+        // สั่งคัดลอกส่วนย่อย 
         function handleCopy(e, text, mode) {
             e.preventDefault();
             let textToCopy = text;
@@ -584,21 +630,57 @@
             helper.select();
             document.execCommand('copy');
             
-            if (mode === 'summary') {
-                const row = e.target.closest('tr');
-                if (row) {
-                    row.classList.add('row-copied');
-                    const checkbox = row.querySelector('.row-checkbox');
-                    if (checkbox) checkbox.checked = true;
-                    updateStats();
-                }
-                showToast("คัดลอกข้อความสรุป & เทสีแถวเรียบร้อย");
-            } else {
-                showToast(`คัดลอกเฉพาะข้อมูลสำเร็จ: "${textToCopy}"`);
-            }
+            showToast(`คัดลอกเฉพาะข้อมูลสำเร็จ: "${textToCopy}"`);
             
             e.target.classList.add('flash-copy');
             setTimeout(() => e.target.classList.remove('flash-copy'), 400);
+        }
+
+        // ระบบจัดการคัดลอกข้อมูลสรุป (New Logic)
+        function handleSummaryCopy(btnElem, textToCopy) {
+            // อัพเดทค่า text ที่ซ่อนไว้สำหรับ copyTableText() ให้เป็นอันที่เลือก
+            const td = btnElem.closest('td');
+            const hiddenSpan = td.querySelector('.summary-text');
+            if (hiddenSpan) hiddenSpan.innerText = textToCopy;
+
+            // สั่งก๊อปปี้ลงคลิปบอร์ด
+            const helper = document.getElementById('clipboardHelper');
+            helper.value = textToCopy;
+            helper.select();
+            document.execCommand('copy');
+            
+            // ทำให้แถวเป็นสีเขียว
+            const row = btnElem.closest('tr');
+            if (row) {
+                row.classList.add('row-copied');
+                const checkbox = row.querySelector('.row-checkbox');
+                if (checkbox) checkbox.checked = true;
+                updateStats();
+            }
+            
+            showToast("คัดลอกข้อความสรุป & เทสีแถวเรียบร้อย");
+            
+            // เอฟเฟกต์กระพริบที่ปุ่ม
+            btnElem.classList.add('flash-copy');
+            setTimeout(() => btnElem.classList.remove('flash-copy'), 400);
+        }
+
+        // ระบบเปิด/ปิด/เลือก Popup (New Logic)
+        function openClassPopup(btnElem) {
+            activeSummaryButton = btnElem;
+            document.getElementById('classPopupModal').classList.remove('hidden');
+        }
+
+        function closeClassPopup() {
+            document.getElementById('classPopupModal').classList.add('hidden');
+            activeSummaryButton = null;
+        }
+
+        function selectClassOption(textToCopy) {
+            if (activeSummaryButton) {
+                handleSummaryCopy(activeSummaryButton, textToCopy);
+            }
+            closeClassPopup();
         }
 
         // ระบบประมวลผลหลัก
@@ -628,34 +710,61 @@
                     const rightFiltered = rightPart.split(/\s+/).filter(w => !MONTHS.includes(w) && w.trim() !== "");
                     const systemPlate = rightFiltered.slice(0, 3).join(" ");
                     const formattedDate = formatDateTime(dateStr);
-                    const summary = `เป็นการอนุมัติรายการคลาดเคลื่อน ทะเบียนผิด ${systemPlate} ทะเบียนที่ถูก ${manualPlate}`;
                     
-                    body.innerHTML += `<tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="p-4 text-center">
-                            <input type="checkbox" class="row-checkbox w-4.5 h-4.5 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500" onchange="updateRowStyle(this)">
+                    // ค่าสรุปผลเริ่มต้น (สำหรับเก็บไว้ใช้ตอน Copy รวมทั้งตาราง)
+                    const defaultSummary = `เป็นการอนุมัติรายการคลาดเคลื่อน ทะเบียนผิด ${systemPlate} ทะเบียนที่ถูก ${manualPlate}`;
+                    
+                    body.innerHTML += `<tr class="hover:bg-slate-50/70 transition-colors duration-200">
+                        <td class="p-4 text-center align-middle">
+                            <input type="checkbox" class="row-checkbox w-5 h-5 text-blue-500 bg-white border-slate-300 rounded focus:ring-blue-500/40 focus:ring-2 cursor-pointer transition-all" onchange="updateRowStyle(this)">
                         </td>
-                        <td class="p-4 font-semibold text-slate-800">
-                            <span class="clickable select-all font-medium" onclick="handleCopy(event, '${manualPlate}', 'plate')" title="คลิกเพื่อคัดลอกเฉพาะทะเบียน">${manualPlate}</span>
+                        <td class="p-4 font-semibold text-slate-800 align-middle">
+                            <span class="clickable select-all font-medium text-[13px]" onclick="handleCopy(event, '${manualPlate}', 'plate')" title="คลิกเพื่อคัดลอกเฉพาะทะเบียน">${manualPlate}</span>
                         </td>
-                        <td class="p-4 text-slate-500 text-xs">
+                        <td class="p-4 text-slate-500 text-xs align-middle font-medium">
                             ${type}
                         </td>
-                        <td class="p-4 text-slate-700 font-bold">${toll}</td>
-                        <td class="p-4">
-                            <span class="clickable text-slate-600 font-mono" onclick="handleCopy(event, '${formattedDate}', 'time')" title="คลิกเพื่อคัดลอก HH:MM">${formattedDate}</span>
+                        <td class="p-4 text-slate-800 font-bold align-middle text-[13px]">${toll}</td>
+                        <td class="p-4 align-middle">
+                            <span class="clickable text-slate-600 font-mono font-medium" onclick="handleCopy(event, '${formattedDate}', 'time')" title="คลิกเพื่อคัดลอก HH:MM">${formattedDate}</span>
                         </td>
-                        <td class="p-4 font-semibold text-slate-800">
-                            <span class="clickable select-all font-medium" onclick="handleCopy(event, '${systemPlate}', 'plate')" title="คลิกเพื่อคัดลอกเฉพาะทะเบียน">${systemPlate}</span>
+                        <td class="p-4 font-semibold text-slate-800 align-middle">
+                            <span class="clickable select-all font-medium text-[13px]" onclick="handleCopy(event, '${systemPlate}', 'plate')" title="คลิกเพื่อคัดลอกเฉพาะทะเบียน">${systemPlate}</span>
                         </td>
-                        <td class="p-4">
-                            <span class="clickable text-slate-600 leading-relaxed block" onclick="handleCopy(event, '${summary}', 'summary')" title="คลิกคัดลอกสรุป (เต็มรูปแบบ) & เทสีแถว">${summary}</span>
+                        <td class="p-4 w-[40%] align-middle">
+                            <!-- ชุดปุ่มตัวเลือกสรุปผลแบบใหม่ดีไซน์ Pill-shaped -->
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="handleSummaryCopy(this, 'เป็นการอนุมัติรายการคลาดเคลื่อน ทะเบียนผิด ${systemPlate} ทะเบียนที่ถูก ${manualPlate}')" 
+                                        class="px-3.5 py-2 bg-blue-50 text-blue-600 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-500 hover:text-white rounded-full border border-blue-200 transition-all duration-300 text-[11px] font-bold shadow-sm hover:shadow-md hover:shadow-blue-500/25 active:scale-95 flex items-center justify-center gap-1.5 group">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-blue-400 group-hover:bg-white transition-colors"></div>
+                                    ทะเบียนผิด
+                                </button>
+                                <button onclick="openClassPopup(this)" 
+                                        class="px-3.5 py-2 bg-purple-50 text-purple-600 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-500 hover:text-white rounded-full border border-purple-200 transition-all duration-300 text-[11px] font-bold shadow-sm hover:shadow-md hover:shadow-purple-500/25 active:scale-95 flex items-center gap-1.5 justify-center group">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-purple-400 group-hover:bg-white transition-colors"></div>
+                                    คลาสผิด
+                                    <svg class="w-3 h-3 ml-0.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                                </button>
+                                <button onclick="handleSummaryCopy(this, 'ถอยหลังชำระเงินสด')" 
+                                        class="px-3.5 py-2 bg-orange-50 text-orange-600 hover:bg-gradient-to-r hover:from-orange-500 hover:to-orange-400 hover:text-white rounded-full border border-orange-200 transition-all duration-300 text-[11px] font-bold shadow-sm hover:shadow-md hover:shadow-orange-500/25 active:scale-95 flex items-center justify-center gap-1.5 group">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-orange-400 group-hover:bg-white transition-colors"></div>
+                                    ถอยหลัง
+                                </button>
+                                <button onclick="handleSummaryCopy(this, 'เป็นรายการซ้ำ')" 
+                                        class="px-3.5 py-2 bg-rose-50 text-rose-600 hover:bg-gradient-to-r hover:from-rose-600 hover:to-rose-500 hover:text-white rounded-full border border-rose-200 transition-all duration-300 text-[11px] font-bold shadow-sm hover:shadow-md hover:shadow-rose-500/25 active:scale-95 flex items-center justify-center gap-1.5 group">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-rose-400 group-hover:bg-white transition-colors"></div>
+                                    รายการซ้ำ
+                                </button>
+                            </div>
+                            <!-- ซ่อนข้อความจริงไว้เพื่อเวลาคลิก 'คัดลอกตาราง (ไม่เอาหัว)' จะได้ดึงข้อความล่าสุดไป -->
+                            <span class="summary-text hidden">${defaultSummary}</span>
                         </td>
-                        <td class="p-4">
-                            <div class="img-cell text-slate-400 text-xs" tabindex="0" onpaste="pasteImage(event, this)">
-                                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        <td class="p-4 align-middle">
+                            <div class="img-cell text-slate-400 text-xs font-medium cursor-pointer" tabindex="0" onpaste="pasteImage(event, this)">
+                                <svg class="w-6 h-6 text-slate-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
-                                <span>วางรูปภาพ (Ctrl+V)</span>
+                                <span>วางรูป (Ctrl+V)</span>
                             </div>
                         </td>
                     </tr>`;
