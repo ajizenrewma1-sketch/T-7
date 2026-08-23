@@ -753,9 +753,52 @@
                     validCount++;
                     const dateStr = dateMatch[0];
                     const [leftPart, rightPart] = line.split(dateStr);
-                    const manualPlate = leftPart.split("ตรวจสอบรายการผ่านทาง")[0].trim();
-                    const type = "ตรวจสอบรายการผ่านทาง";
-                    const toll = leftPart.split("ผ่านทาง")[1].trim().split(/\s+/)[0];
+                    
+                    const types = [
+                        { key: "ตรวจสอบการผ่านทางที่ผิดกฎหมาย", label: "ตรวจสอบการผ่านทางที่ผิดกฎหมาย" },
+                        { key: "ตรวจสอบการผ่านทางที่ได้รับการยกเว้น", label: "ตรวจสอบการผ่านทางที่ได้รับการยกเว้น" },
+                        { key: "ตรวจสอบรายการผ่านทาง", label: "ตรวจสอบรายการผ่านทาง" },
+                        { key: "-", label: "-" },
+                        { key: " - ", label: "-" }
+                    ];
+                    
+                    let foundTypeObj = types[2];
+                    let matchedKey = "";
+                    for (const t of types) {
+                        if (leftPart.includes(t.key)) {
+                            matchedKey = t.key;
+                            foundTypeObj = t;
+                            break;
+                        }
+                    }
+                    
+                    let manualPlate = "";
+                    let type = "ตรวจสอบรายการผ่านทาง";
+                    let toll = "";
+
+                    if (matchedKey) {
+                        const parts = leftPart.split(matchedKey);
+                        manualPlate = parts[0].trim();
+                        let afterType = parts[1] ? parts[1].trim() : "";
+                        
+                        const tollMatch = afterType.match(/(TC\d+)/);
+                        if (tollMatch) {
+                            const tollIndex = afterType.indexOf(tollMatch[1]);
+                            const suffix = afterType.substring(0, tollIndex).trim();
+                            toll = tollMatch[1];
+                            type = suffix ? foundTypeObj.label + suffix : foundTypeObj.label;
+                        } else {
+                            const tokens = afterType.split(/\s+/);
+                            toll = tokens[0] || "";
+                            const suffix = tokens.slice(1).join(" ");
+                            type = suffix ? foundTypeObj.label + suffix : foundTypeObj.label;
+                        }
+                    } else {
+                        manualPlate = leftPart.trim();
+                        type = "-";
+                        toll = "";
+                    }
+                    
                     const rightFiltered = rightPart.split(/\s+/).filter(w => !MONTHS.includes(w) && w.trim() !== "");
                     const systemPlate = rightFiltered.slice(0, 3).join(" ");
                     const formattedDate = formatDateTime(dateStr);
